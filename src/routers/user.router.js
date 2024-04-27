@@ -1,18 +1,25 @@
-import { Router } from 'express';
-import jwt from 'jsonwebtoken';
+import { Router } from "express";
+import jwt from "jsonwebtoken";
 const router = Router();
-import { BAD_REQUEST } from '../constants/httpStatus.js';
-import handler from 'express-async-handler';
-import { UserModel } from '../models/user.model.js';
-import bcrypt from 'bcryptjs';
-import auth from '../middleware/auth.mid.js';
-import admin from '../middleware/admin.mid.js';
+import { BAD_REQUEST } from "../constants/httpStatus.js";
+import handler from "express-async-handler";
+import { UserModel } from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import auth from "../middleware/auth.mid.js";
+import admin from "../middleware/admin.mid.js";
+import validateEmailDomain from "../helpers/mail.validate.js";
 const PASSWORD_HASH_SALT_ROUNDS = 10;
 
 router.post(
-  '/login',
+  "/login",
   handler(async (req, res) => {
     const { email, password } = req.body;
+    const isValid = await validateEmailDomain(email);
+    console.log(isValid);
+    if (!isValid) {
+      res.status(BAD_REQUEST).send("Invalid Email");
+      return;
+    }
     const user = await UserModel.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -20,19 +27,24 @@ router.post(
       return;
     }
 
-    res.status(BAD_REQUEST).send('Username or password is invalid');
+    res.status(BAD_REQUEST).send("Username or password is invalid");
   })
 );
 
 router.post(
-  '/register',
+  "/register",
   handler(async (req, res) => {
     const { name, email, password, address } = req.body;
-
+    const isValid = await validateEmailDomain(email);
+    console.log(isValid);
+    if (!isValid) {
+      res.status(BAD_REQUEST).send("Invalid Email");
+      return;
+    }
     const user = await UserModel.findOne({ email });
 
     if (user) {
-      res.status(BAD_REQUEST).send('User already exists, please login!');
+      res.status(BAD_REQUEST).send("User already exists, please login!");
       return;
     }
 
@@ -54,7 +66,7 @@ router.post(
 );
 
 router.put(
-  '/updateProfile',
+  "/updateProfile",
   auth,
   handler(async (req, res) => {
     const { name, address } = req.body;
@@ -69,21 +81,21 @@ router.put(
 );
 
 router.put(
-  '/changePassword',
+  "/changePassword",
   auth,
   handler(async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const user = await UserModel.findById(req.user.id);
 
     if (!user) {
-      res.status(BAD_REQUEST).send('Change Password Failed!');
+      res.status(BAD_REQUEST).send("Change Password Failed!");
       return;
     }
 
     const equal = await bcrypt.compare(currentPassword, user.password);
 
     if (!equal) {
-      res.status(BAD_REQUEST).send('Current Password Is Not Correct!');
+      res.status(BAD_REQUEST).send("Current Password Is Not Correct!");
       return;
     }
 
@@ -95,13 +107,13 @@ router.put(
 );
 
 router.get(
-  '/getall/:searchTerm?',
+  "/getall/:searchTerm?",
   admin,
   handler(async (req, res) => {
     const { searchTerm } = req.params;
 
     const filter = searchTerm
-      ? { name: { $regex: new RegExp(searchTerm, 'i') } }
+      ? { name: { $regex: new RegExp(searchTerm, "i") } }
       : {};
 
     const users = await UserModel.find(filter, { password: 0 });
@@ -110,7 +122,7 @@ router.get(
 );
 
 router.put(
-  '/toggleBlock/:userId',
+  "/toggleBlock/:userId",
   admin,
   handler(async (req, res) => {
     const { userId } = req.params;
@@ -129,7 +141,7 @@ router.put(
 );
 
 router.get(
-  '/getById/:userId',
+  "/getById/:userId",
   admin,
   handler(async (req, res) => {
     const { userId } = req.params;
@@ -139,7 +151,7 @@ router.get(
 );
 
 router.put(
-  '/update',
+  "/update",
   admin,
   handler(async (req, res) => {
     const { id, name, email, address, isAdmin } = req.body;
@@ -154,7 +166,7 @@ router.put(
   })
 );
 
-const generateTokenResponse = user => {
+const generateTokenResponse = (user) => {
   const token = jwt.sign(
     {
       id: user.id,
@@ -163,7 +175,7 @@ const generateTokenResponse = user => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '30d',
+      expiresIn: "30d",
     }
   );
 
