@@ -16,12 +16,12 @@ export const dbconnect = async () => {
         console.log("Connected to MongoDB");
       }
     );
-
     console.log("Waiting");
     await seedUsers();
     await seedFoods();
     console.log("connect successfully---");
   } catch (error) {
+    console.log("Not connected");
     console.log(error);
   }
 };

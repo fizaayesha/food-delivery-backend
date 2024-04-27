@@ -20,7 +20,7 @@ const getReceiptHtml = function (order) {
     <head>
       <style>
       table {
-        border-collapse: collapse;
+        border-collapse:5 collapse;
         max-width:35rem;
         width: 100%;
       }
