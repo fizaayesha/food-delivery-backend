@@ -20,8 +20,6 @@ export const dbconnect = async () => {
     console.log("Not connected");
     console.log(error);
   } 
-  // finally {
-  // }
 };
 
 async function seedUsers() {
