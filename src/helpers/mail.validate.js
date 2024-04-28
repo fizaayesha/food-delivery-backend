@@ -8,14 +8,14 @@ function validateEmailDomain(email) {
         // Perform DNS lookup for MX records
         dns.resolveMx(domain, (err, addresses) => {
             if (err) {
-                reject("DNS lookup error");
+                resolve(false);
                 return;
             }
             
             // Check if any MX record is found
             if (addresses && addresses.length > 0) {
                 // Define allowed domains
-                const allowedDomains = [".edu", "st.jmi.ac"]; // Add more domains as needed
+                const allowedDomains = [".edu", "st.jmi.ac.in"]; // Add more domains as needed
                 
                 // Check if the domain matches any of the allowed domains
                 const isValidDomain = allowedDomains.some((allowedDomain) =>

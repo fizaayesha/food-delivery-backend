@@ -17,7 +17,7 @@ const __dirname = dirname(__filename);
 const app = express();
 app.use(
   cors({
-    origin: ["https://food-delivery-frontend-henna.vercel.app"],
+    origin: ["https://food-delivery-frontend-henna.vercel.app","http://localhost:5000"],
     methods: ["POST", "GET"],
     credentials: true,
   })
