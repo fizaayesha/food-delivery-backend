@@ -15,7 +15,7 @@ router.post(
   handler(async (req, res) => {
     const order = req.body;
 
-    if (order.items.length <= 0) res.status(BAD_REQUEST).send('Cart Is Empty!');
+    if (order.items.length <= 0) return res.status(BAD_REQUEST).send('Cart Is Empty!');
 
     await OrderModel.deleteOne({
       user: req.user.id,
@@ -24,7 +24,7 @@ router.post(
 
     const newOrder = new OrderModel({ ...order, user: req.user.id });
     await newOrder.save();
-    res.send(newOrder);
+    return res.send(newOrder);
   })
 );
 
@@ -34,8 +34,7 @@ router.put(
     const { paymentId } = req.body;
     const order = await getNewOrderForCurrentUser(req);
     if (!order) {
-      res.status(BAD_REQUEST).send('Order Not Found!');
-      return;
+      return res.status(BAD_REQUEST).send('Order Not Found!');
     }
 
     order.paymentId = paymentId;
@@ -44,7 +43,7 @@ router.put(
 
     sendEmailReceipt(order);
 
-    res.send(order._id);
+    return res.send(order._id);
   })
 );
 
@@ -74,14 +73,14 @@ router.get(
   '/newOrderForCurrentUser',
   handler(async (req, res) => {
     const order = await getNewOrderForCurrentUser(req);
-    if (order) res.send(order);
-    else res.status(BAD_REQUEST).send();
+    if (order) return res.send(order);
+    else return res.status(BAD_REQUEST).send();
   })
 );
 
 router.get('/allstatus', (req, res) => {
   const allStatus = Object.values(OrderStatus);
-  res.send(allStatus);
+  return res.send(allStatus);
 });
 
 router.get(
@@ -95,7 +94,7 @@ router.get(
     if (status) filter.status = status;
 
     const orders = await OrderModel.find(filter).sort('-createdAt');
-    res.send(orders);
+    return res.send(orders);
   })
 );
 

@@ -17,17 +17,16 @@ router.post(
     const isValid = await validateEmailDomain(email);
     console.log(isValid);
     if (!isValid) {
-      res.status(BAD_REQUEST).send("Invalid Email");
-      return;
+      return res.status(BAD_REQUEST).send("Invalid Email");
     }
     const user = await UserModel.findOne({ email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.send(generateTokenResponse(user));
+      return res.send(generateTokenResponse(user));
       return;
     }
 
-    res.status(BAD_REQUEST).send("Username or password is invalid");
+    return res.status(BAD_REQUEST).send("Username or password is invalid");
   })
 );
 
@@ -38,14 +37,12 @@ router.post(
     const isValid = await validateEmailDomain(email);
     console.log(isValid);
     if (!isValid) {
-      res.status(BAD_REQUEST).send("Invalid Email");
-      return;
+      return res.status(BAD_REQUEST).send("Invalid Email");
     }
     const user = await UserModel.findOne({ email });
 
     if (user) {
-      res.status(BAD_REQUEST).send("User already exists, please login!");
-      return;
+      return res.status(BAD_REQUEST).send("User already exists, please login!");
     }
 
     const hashedPassword = await bcrypt.hash(
@@ -61,7 +58,7 @@ router.post(
     };
 
     const result = await UserModel.create(newUser);
-    res.send(generateTokenResponse(result));
+    return res.send(generateTokenResponse(result));
   })
 );
 
@@ -76,7 +73,7 @@ router.put(
       { new: true }
     );
 
-    res.send(generateTokenResponse(user));
+    return res.send(generateTokenResponse(user));
   })
 );
 
@@ -88,21 +85,19 @@ router.put(
     const user = await UserModel.findById(req.user.id);
 
     if (!user) {
-      res.status(BAD_REQUEST).send("Change Password Failed!");
-      return;
+      return res.status(BAD_REQUEST).send("Change Password Failed!");
     }
 
     const equal = await bcrypt.compare(currentPassword, user.password);
 
     if (!equal) {
-      res.status(BAD_REQUEST).send("Current Password Is Not Correct!");
-      return;
+      return res.status(BAD_REQUEST).send("Current Password Is Not Correct!");
     }
 
     user.password = await bcrypt.hash(newPassword, PASSWORD_HASH_SALT_ROUNDS);
     await user.save();
 
-    res.send();
+    return res.send();
   })
 );
 
@@ -117,7 +112,7 @@ router.get(
       : {};
 
     const users = await UserModel.find(filter, { password: 0 });
-    res.send(users);
+    return res.send(users);
   })
 );
 
@@ -128,15 +123,14 @@ router.put(
     const { userId } = req.params;
 
     if (userId === req.user.id) {
-      res.status(BAD_REQUEST).send("Can't block yourself!");
-      return;
+      return res.status(BAD_REQUEST).send("Can't block yourself!");
     }
 
     const user = await UserModel.findById(userId);
     user.isBlocked = !user.isBlocked;
     user.save();
 
-    res.send(user.isBlocked);
+    return res.send(user.isBlocked);
   })
 );
 
@@ -146,7 +140,7 @@ router.get(
   handler(async (req, res) => {
     const { userId } = req.params;
     const user = await UserModel.findById(userId, { password: 0 });
-    res.send(user);
+    return res.send(user);
   })
 );
 
@@ -162,7 +156,7 @@ router.put(
       isAdmin,
     });
 
-    res.send();
+    return res.send();
   })
 );
 

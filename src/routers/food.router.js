@@ -9,7 +9,7 @@ router.get(
   '/',
   handler(async (req, res) => {
     const foods = await FoodModel.find({});
-    res.send(foods);
+    return res.send(foods);
   })
 );
 
@@ -32,7 +32,7 @@ router.post(
 
     await food.save();
 
-    res.send(food);
+    return res.send(food);
   })
 );
 
@@ -56,7 +56,7 @@ router.put(
       }
     );
 
-    res.send();
+    return res.send();
   })
 );
 
@@ -66,7 +66,7 @@ router.delete(
   handler(async (req, res) => {
     const { foodId } = req.params;
     await FoodModel.deleteOne({ _id: foodId });
-    res.send();
+    return res.send();
   })
 );
 
@@ -99,7 +99,7 @@ router.get(
 
     tags.unshift(all);
 
-    res.send(tags);
+    return res.send(tags);
   })
 );
 
@@ -110,7 +110,7 @@ router.get(
     const searchRegex = new RegExp(searchTerm, 'i');
 
     const foods = await FoodModel.find({ name: { $regex: searchRegex } });
-    res.send(foods);
+    return  res.send(foods);
   })
 );
 
@@ -119,7 +119,7 @@ router.get(
   handler(async (req, res) => {
     const { tag } = req.params;
     const foods = await FoodModel.find({ tags: tag });
-    res.send(foods);
+    return res.send(foods);
   })
 );
 
@@ -128,7 +128,7 @@ router.get(
   handler(async (req, res) => {
     const { foodId } = req.params;
     const food = await FoodModel.findById(foodId);
-    res.send(food);
+    return res.send(food);
   })
 );
 
